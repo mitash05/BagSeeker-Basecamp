@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROTOCOL READOUT</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #000000;
+            --terminal-green: #00FF41;
+            --dim-green: rgba(0, 255, 65, 0.2);
+            --redacted: #00FF41;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--terminal-green);
+            font-family: 'JetBrains Mono', monospace;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        h2 {
+            border-bottom: 2px solid var(--terminal-green);
+            padding-bottom: 5px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+        }
+
+        .header-meta {
+            font-size: 0.7rem;
+            border: 1px solid var(--dim-green);
+            padding: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .checklist-item {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .checklist-item::before {
+            content: "[ ]";
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .warning-box {
+            border: 1px dashed var(--terminal-green);
+            padding: 15px;
+            margin: 20px 0;
+            background: rgba(0, 255, 65, 0.05);
+        }
+
+        .redacted-block {
+            background-color: var(--terminal-green);
+            color: black;
+            padding: 2px 5px;
+            font-weight: bold;
+            cursor: not-allowed;
+            user-select: none;
+        }
+
+        .locked-section {
+            border: 1px solid var(--dim-green);
+            padding: 20px;
+            text-align: center;
+            opacity: 0.7;
+            margin-top: 20px;
+        }
+
+        .cta-btn {
+            background: var(--terminal-green);
+            color: black;
+            text-decoration: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-meta">
+        <span>IDENTITY: CONFIRMED</span>
+        <span>CLEARANCE: LEVEL-5</span>
+    </div>
+
+    <center>
+        <h3>THE BAGSEEKER'S PROTOCOL</h3>
+        <p style="font-size: 0.8rem; opacity: 0.8;">[ LIVE FIRE EXERCISE ]</p>
+    </center>
+
+    <h2>// 01. THE NO-GO ZONES</h2>
+    <div class="warning-box">
+        <p><strong>RULE:</strong> No setup is a setup if conditions aren't clean.</p>
+    </div>
+    <ul style="list-style: none; padding: 0;">
+        <li class="checklist-item">Price trapped between HTF support/resistance</li>
+        <li class="checklist-item">News window < 30 minutes (CPI, FOMC)</li>
+        <li class="checklist-item">Emotion check: You are "bored" or looking for action</li>
+    </ul>
+
+    <h2>// 02. SNIPER ENTRY CHECKLIST</h2>
+    <p>If all boxes aren't checked, you stand down.</p>
+    <br>
+    <div class="checklist-item">HTF trend aligned (5m confirms 1h bias)</div>
+    <div class="checklist-item">Liquidity sweep OR rejection candle</div>
+    <div class="checklist-item">Volume expansion on entry candle</div>
+    <div class="checklist-item">Risk &le; 1-2% of account</div>
+
+    <h2>// 03. ATTACK PATTERNS</h2>
+    
+    <p><strong>SETUP #1: LIQUIDITY SWEEP REVERSAL</strong></p>
+    <ol style="margin-left: 20px; margin-bottom: 20px;">
+        <li>Market hunts stops (long wick).</li>
+        <li>Rejection candle confirms.</li>
+        <li>Entry on retrace.</li>
+    </ol>
+
+    <p><strong>SETUP #2: TREND PULLBACK CONTINUATION</strong></p>
+    <ol style="margin-left: 20px;">
+        <li>Strong impulse move.</li>
+        <li>Shallow pullback (drift, not crash).</li>
+        <li>Volume expansion on re-entry.</li>
+    </ol>
+
+    <div class="locked-section">
+        <p style="margin-bottom: 10px;">REMAINING INTEL: CLASSIFIED</p>
+        <p>
+            SETUP #3: <span class="redacted-block">REDACTED</span><br>
+            SETUP #4: <span class="redacted-block">REDACTED</span><br>
+            SETUP #5: <span class="redacted-block">REDACTED</span>
+        </p>
+        <br>
+        <p style="font-size: 0.8rem;">FULL EXECUTION EXAMPLES INSIDE THE TERMINAL</p>
+        <a href="https://bingx.com/invite/YOUR_CODE" class="cta-btn">UNLOCK ALL DATA</a>
+    </div>
+
+    <br><br>
+    <center>
+        <a href="index.html" style="color: var(--terminal-green); font-size: 0.8rem;">&lt; RETURN TO BASE</a>
+    </center>
+
+</body>
+</html>
