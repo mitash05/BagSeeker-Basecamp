@@ -221,7 +221,79 @@
     </style>
 </head>
 <body>
+<div id="ticker-wrap" style="
+    position: fixed; top: 0; left: 0; width: 100%; height: 30px; 
+    background: #000; border-bottom: 1px solid #333; 
+    z-index: 9999; overflow: hidden; white-space: nowrap;
+    display: flex; align-items: center;
+">
+    <div id="ticker-move" style="
+        display: inline-block; 
+        animation: tickerScroll 20s linear infinite;
+        padding-left: 100%;
+        font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+    ">
+        <span style="color: #666;">INITIALIZING FEED...</span>
+    </div>
+</div>
 
+<style>
+    @keyframes tickerScroll {
+        0% { transform: translate3d(0, 0, 0); }
+        100% { transform: translate3d(-100%, 0, 0); }
+    }
+    
+    /* Push body down so ticker doesn't cover content */
+    body { padding-top: 30px !important; } 
+    
+    .ticker-item { margin-right: 30px; color: #fff; }
+    .ticker-up { color: #5EFC87; }
+    .ticker-down { color: #ff3c3c; }
+</style>
+
+<script>
+    async function fetchPrices() {
+        // Pairs to fetch
+        const pairs = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'DOGEUSDT', 'XRPUSDT'];
+        const display = document.getElementById('ticker-move');
+        
+        try {
+            // Using Binance public ticker API
+            const response = await fetch('https://api.binance.com/api/v3/ticker/price');
+            const data = await response.json();
+            
+            let html = '';
+            
+            // Filter and build string
+            pairs.forEach(pair => {
+                const item = data.find(d => d.symbol === pair);
+                if(item) {
+                    // Clean up the price (remove extra zeros)
+                    const price = parseFloat(item.price).toLocaleString();
+                    const name = pair.replace('USDT', '');
+                    
+                    html += `<span class="ticker-item">
+                        <span style="font-weight:bold; color: #7B9C87;">${name}</span> 
+                        $${price}
+                    </span>`;
+                }
+            });
+            
+            // Add a "System Status" at the end for flavor
+            html += `<span class="ticker-item" style="color:#5EFC87;">[ SYSTEM: ONLINE ]</span>`;
+            
+            display.innerHTML = html;
+            
+        } catch (e) {
+            console.log('Ticker offline');
+        }
+    }
+
+    // Update every 5 seconds
+    fetchPrices();
+    setInterval(fetchPrices, 5000);
+</script>
+    
     <header class="hud-header">
         <div class="hud-brand">THE BAGSEEKER <span style="font-size: 0.5em; vertical-align: super; color: var(--hex-muted);">TM</span></div>
         <div class="hud-meta">
