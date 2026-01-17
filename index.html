@@ -3,252 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Base Camp | The Bagseeker</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-
+    <title>CONFIDENTIAL // EYES ONLY</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #050505;
-            --card-bg: #111111;
-            --text-main: #ffffff;
-            --text-muted: #888888;
-            --tactical-green: #00FF41;
-            --tactical-glow: rgba(0, 255, 65, 0.4);
-            --border-radius: 12px;
+            --bg-color: #000000;
+            --terminal-green: #00FF41;
+            --dim-green: rgba(0, 255, 65, 0.3);
+            --alert-red: #FF3333;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        /* App Container */
-        .app-container {
-            width: 100%;
-            max-width: 480px; /* Limits width to look like an app on desktop */
+            color: var(--terminal-green);
+            font-family: 'JetBrains Mono', monospace;
             display: flex;
             flex-direction: column;
-            gap: 32px;
-            padding-top: 20px;
-        }
-
-        /* Hero Section */
-        .hero {
-            text-align: center;
-        }
-
-        .hero h1 {
-            font-size: 2.2rem;
-            font-weight: 900;
-            letter-spacing: -1px;
-            line-height: 1.1;
-            margin-bottom: 12px;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
             text-transform: uppercase;
         }
 
-        .hero p {
-            color: var(--text-muted);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem;
-            margin-bottom: 24px;
+        .container {
+            width: 100%;
+            max-width: 450px;
+            border: 1px solid var(--dim-green);
+            padding: 2px; /* Double border effect */
         }
 
-        .visual-banner {
-            width: 100%;
-            height: 200px;
-            background-color: var(--card-bg);
-            border: 1px dashed var(--text-muted);
-            border-radius: var(--border-radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
+        .inner-border {
+            border: 1px solid var(--terminal-green);
+            padding: 24px;
+            height: 100%;
             position: relative;
         }
-        
-        /* Placeholder for your image - remove this css when you add real img */
-        .visual-banner::after {
-            content: "[ DIGITAL PATHFINDER VISUAL ]";
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-        }
 
-        /* If using a real image, use this class */
-        .visual-banner img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* The Armory (Monetization) */
-        .armory {
+        /* Glitch/Header */
+        .top-bar {
             display: flex;
-            flex-direction: column;
-            gap: 16px;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            margin-bottom: 30px;
+            border-bottom: 1px dashed var(--dim-green);
+            padding-bottom: 10px;
         }
 
-        .badge {
-            background-color: rgba(0, 255, 65, 0.1);
-            color: var(--tactical-green);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            padding: 6px 12px;
-            border-radius: 4px;
+        h1 {
+            font-size: 1.8rem;
+            line-height: 1.1;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px var(--dim-green);
+        }
+
+        p.sub {
+            font-size: 0.85rem;
+            color: #ccc;
+            margin-bottom: 40px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            margin-bottom: 16px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: 0.2s;
             text-align: center;
-            border: 1px solid rgba(0, 255, 65, 0.3);
-            margin-bottom: 8px;
-            display: inline-block;
+            position: relative;
         }
 
         .btn-primary {
-            background-color: var(--card-bg);
-            color: var(--text-main);
-            text-decoration: none;
-            padding: 18px;
-            border-radius: var(--border-radius);
-            font-weight: 700;
-            text-align: center;
-            border: 1px solid var(--tactical-green);
-            box-shadow: 0 0 15px var(--tactical-glow);
-            transition: all 0.2s ease;
-            position: relative;
-            overflow: hidden;
+            background: var(--terminal-green);
+            color: #000;
         }
-
         .btn-primary:hover {
-            box-shadow: 0 0 25px var(--tactical-glow);
-            transform: translateY(-2px);
-            background-color: #1a1a1a;
+            background: #fff;
+            box-shadow: 0 0 15px var(--terminal-green);
         }
 
-        /* The Intel (Lead Magnet) */
-        .intel {
-            background-color: var(--card-bg);
-            padding: 24px;
-            border-radius: var(--border-radius);
-            border: 1px solid #222;
+        .btn-outline {
+            border: 1px solid var(--terminal-green);
+            color: var(--terminal-green);
+            background: transparent;
+        }
+        .btn-outline:hover {
+            background: var(--dim-green);
         }
 
-        .intel h3 {
-            font-size: 1.1rem;
-            margin-bottom: 16px;
-            font-weight: 700;
+        .status-blink {
+            animation: blink 1s infinite;
         }
 
-        .email-form {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.2; }
+            100% { opacity: 1; }
         }
 
-        input[type="email"] {
-            background-color: #050505;
-            border: 1px solid #333;
-            color: white;
-            padding: 14px;
-            border-radius: 8px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem;
-            outline: none;
+        .watermark {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 0.6rem;
+            color: var(--dim-green);
+            writing-mode: vertical-rl;
         }
-
-        input[type="email"]:focus {
-            border-color: var(--text-muted);
-        }
-
-        .btn-secondary {
-            background-color: #333;
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .btn-secondary:hover {
-            background-color: #444;
-        }
-
-        /* Social Proof */
-        .social-proof {
-            text-align: center;
-            color: var(--text-muted);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            padding-bottom: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .dot {
-            width: 8px;
-            height: 8px;
-            background-color: var(--tactical-green);
-            border-radius: 50%;
-            display: inline-block;
-            box-shadow: 0 0 8px var(--tactical-green);
-        }
-
     </style>
 </head>
 <body>
 
-    <main class="app-container">
-        
-        <section class="hero">
-            <h1>Stop Gambling.<br>Start Hunting.</h1>
-            <p>Join the few who trade with a map.</p>
-            
-            <div class="visual-banner">
-                </div>
-        </section>
-
-        <section class="armory">
-            <div style="text-align: center;">
-                <span class="badge">STATUS: RECRUITMENT OPEN + $5,000 BONUS</span>
+    <div class="container">
+        <div class="inner-border">
+            <div class="top-bar">
+                <span>SYSTEM INTEGRITY: OPTIMAL</span>
+                <span>LAT 38.89 N</span>
             </div>
-            
-            <a href="https://bingx.com/invite/YOUR_CODE" class="btn-primary" target="_blank">
-                ACCESS TRADING TERMINAL
+
+            <p style="font-size: 0.7rem; color: var(--terminal-green); margin-bottom: 10px;">
+                [ CODENAME: BAGSEEKER ]
+            </p>
+
+            <h1>THE HUNTER'S<br>FIELD MANUAL</h1>
+            <p class="sub">5 High-Probability Setups That Don't Miss. <br>[CONFIDENTIAL // EYES ONLY]</p>
+
+            <a href="protocol.html" class="btn btn-outline">
+                > INITIALIZE PROTOCOL READ_OUT
             </a>
-        </section>
 
-        <hr style="border: 0; border-top: 1px solid #222;">
+            <div style="margin-top: 40px; border-top: 1px solid var(--dim-green); padding-top: 20px;">
+                <p style="font-size: 0.7rem; margin-bottom: 10px;">
+                    <span class="status-blink">●</span> ARMORY ACCESS OPEN
+                </p>
+                <a href="https://bingx.com/invite/YOUR_CODE" target="_blank" class="btn btn-primary">
+                    DEPLOY TO TERMINAL (BINGX)
+                </a>
+            </div>
 
-        <section class="intel">
-            <h3>Get The Field Manual</h3>
-            
-            <form action="https://formspree.io/f/your-form-id" method="POST" class="email-form">
-                <input type="email" name="email" placeholder="Enter your email" required>
-                <button type="submit" class="btn-secondary">DOWNLOAD FREE PDF</button>
-            </form>
-        </section>
-
-        <div class="social-proof">
-            <span class="dot"></span>
-            HUNTING WITH 150+ TRADERS
+            <div class="watermark">AES-256 ENCRYPTED</div>
         </div>
-
-    </main>
+    </div>
 
 </body>
 </html>
