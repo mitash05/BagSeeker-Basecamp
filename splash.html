@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BAGSEEKER // ACCESS CONTROL</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --hex-bg: rgb(7, 22, 15);
+            --hex-grid: rgb(32, 49, 38);
+            --hex-text: rgb(94, 252, 135);
+            --hex-muted: rgb(123, 156, 135);
+            --hex-alert: rgb(255, 60, 60);
+            --hex-dark-accent: rgb(39, 63, 44);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--hex-bg);
+            color: var(--hex-text);
+            font-family: 'JetBrains Mono', monospace;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        /* --- BACKGROUND FX --- */
+        .grid-bg {
+            position: absolute; width: 200%; height: 200%;
+            background-image: 
+                linear-gradient(var(--hex-grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--hex-grid) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.3;
+            transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px);
+            animation: gridMove 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes gridMove {
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-200px); }
+            100% { transform: perspective(500px) rotateX(60deg) translateY(50px) translateZ(-200px); }
+        }
+
+        .vignette {
+            position: fixed; inset: 0;
+            background: radial-gradient(circle, transparent 40%, #000 100%);
+            z-index: 0; pointer-events: none;
+        }
+
+        /* --- CARD DESIGN --- */
+        .access-card {
+            width: 100%; max-width: 400px;
+            padding: 40px;
+            background: rgba(7, 22, 15, 0.95);
+            border: 1px solid var(--hex-dark-accent);
+            text-align: center;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            clip-path: polygon(
+                20px 0, 100% 0, 
+                100% calc(100% - 20px), calc(100% - 20px) 100%, 
+                0 100%, 0 20px
+            );
+            backdrop-filter: blur(5px);
+        }
+
+        /* Tactical Corners */
+        .access-card::before, .access-card::after {
+            content: ''; position: absolute; width: 20px; height: 20px;
+            border: 2px solid var(--hex-text); transition: 0.3s;
+        }
+        .access-card::before { top: 0; left: 0; border-width: 2px 0 0 2px; }
+        .access-card::after { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+
+        .logo {
+            font-size: 2.5rem; font-weight: 700; letter-spacing: -2px;
+            margin-bottom: 5px; text-shadow: 0 0 15px rgba(94, 252, 135, 0.5);
+        }
+
+        .status {
+            font-size: 0.75rem; color: var(--hex-muted); margin-bottom: 40px;
+            letter-spacing: 2px; text-transform: uppercase;
+        }
+
+        /* --- ENTER BUTTON --- */
+        .btn-enter {
+            background: transparent; color: var(--hex-text);
+            border: 1px solid var(--hex-text);
+            padding: 15px 40px;
+            font-family: inherit; font-size: 1rem; font-weight: bold;
+            text-transform: uppercase; cursor: crosshair;
+            transition: 0.3s; position: relative; overflow: hidden;
+            letter-spacing: 1px;
+        }
+
+        .btn-enter:hover {
+            background: var(--hex-text); color: var(--hex-bg);
+            box-shadow: 0 0 30px var(--hex-text);
+        }
+
+        /* Loading Bar */
+        .loader {
+            width: 0%; height: 2px; background: var(--hex-text);
+            margin: 20px auto 0; transition: width 0.1s;
+        }
+
+        /* --- ANIMATIONS --- */
+        .exiting {
+            animation: collapse 0.5s forwards ease-in;
+        }
+
+        @keyframes collapse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(0.95, 0.05); opacity: 0.5; }
+            100% { transform: scale(0, 0); opacity: 0; }
+        }
+
+        /* Glitch text effect */
+        .glitch-wrapper { display: inline-block; position: relative; }
+        
+    </style>
+</head>
+<body>
+
+    <div class="grid-bg"></div>
+    <div class="vignette"></div>
+
+    <div class="access-card" id="card">
+        <div class="logo glitch-wrapper" data-text="BAGSEEKER">BAGSEEKER</div>
+        <div class="status" id="status-text">SYSTEM SECURE</div>
+
+        <div id="btn-container">
+            <button class="btn-enter" id="enterBtn">INITIALIZE</button>
+        </div>
+
+        <div class="loader" id="loader"></div>
+        
+        <div style="margin-top: 20px; font-size: 0.6rem; color: var(--hex-dark-accent);">
+            ID: <span id="uuid">GENERATING...</span>
+        </div>
+    </div>
+
+    <script>
+        const btn = document.getElementById('enterBtn');
+        const card = document.getElementById('card');
+        const loader = document.getElementById('loader');
+        const statusText = document.getElementById('status-text');
+        const uuid = document.getElementById('uuid');
+
+        // Random UUID generator effect
+        let uuidInterval = setInterval(() => {
+            uuid.innerText = Math.random().toString(36).substring(2, 15).toUpperCase();
+        }, 50);
+
+        setTimeout(() => { clearInterval(uuidInterval); uuid.innerText = "ACCESS-AUTH-99"; }, 1000);
+
+        btn.addEventListener('click', () => {
+            // 1. Change UI to loading state
+            btn.style.display = 'none';
+            statusText.innerText = "ESTABLISHING UPLINK...";
+            statusText.style.color = "var(--hex-text)";
+            
+            // 2. Animate bar
+            let width = 0;
+            const loadInt = setInterval(() => {
+                width += Math.random() * 15;
+                if(width > 100) width = 100;
+                loader.style.width = width + '%';
+
+                if(width === 100) {
+                    clearInterval(loadInt);
+                    // 3. Exit Animation
+                    setTimeout(() => {
+                        card.classList.add('exiting');
+                        // 4. REDIRECT (Change 'home.html' to your actual main landing page file)
+                        setTimeout(() => { window.location.href = 'home.html'; }, 600);
+                    }, 400);
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>
