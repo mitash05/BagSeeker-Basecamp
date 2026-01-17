@@ -3,152 +3,392 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PROTOCOL READOUT</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <title>PROTOCOL // IDENTITY CONFIRMED</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --bg-color: #000000;
-            --terminal-green: #00FF41;
-            --dim-green: rgba(0, 255, 65, 0.2);
-            --redacted: #00FF41;
+            /* USER DEFINED PALETTE */
+            --hex-bg: rgb(7, 22, 15);           /* #07160F */
+            --hex-grid: rgb(32, 49, 38);        /* #203126 */
+            --hex-text: rgb(94, 252, 135);      /* #5EFC87 - Bright Terminal Green */
+            --hex-muted: rgb(123, 156, 135);    /* #7B9C87 - Muted Grey-Green */
+            --hex-dark-accent: rgb(39, 63, 44); /* #273F2C */
+            
+            --scanline-color: rgba(0, 0, 0, 0.5);
         }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--terminal-green);
+            background-color: var(--hex-bg);
+            color: var(--hex-text);
             font-family: 'JetBrains Mono', monospace;
-            padding: 20px;
-            max-width: 600px;
+            overflow-x: hidden;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        /* TACTICAL GRID BACKGROUND  */
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: 
+                linear-gradient(var(--hex-grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--hex-grid) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.6;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* VIGNETTE & SCANLINE OVERLAY */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 60%, black 100%);
+            z-index: 100;
+            pointer-events: none;
+        }
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px;
+            z-index: 99;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        /* LAYOUT */
+        .container {
+            max-width: 700px;
             margin: 0 auto;
-            line-height: 1.5;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 2;
         }
 
-        h2 {
-            border-bottom: 2px solid var(--terminal-green);
-            padding-bottom: 5px;
-            margin-top: 40px;
-            margin-bottom: 20px;
-            font-size: 1.2rem;
+        /* TYPOGRAPHY */
+        h1, h2, h3 {
             text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: -1px;
         }
 
-        .header-meta {
+        .text-muted { color: var(--hex-muted); }
+        .text-accent { color: var(--hex-dark-accent); }
+
+        /* HERO SECTION (Matches uploaded image vibe) [cite: 11, 215] */
+        .hero {
+            height: 90vh; /* Takes up most of the screen */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-bottom: 1px dashed var(--hex-grid);
+            margin-bottom: 60px;
+        }
+
+        .top-meta {
+            position: absolute;
+            top: 20px;
+            left: 20px;
             font-size: 0.7rem;
-            border: 1px solid var(--dim-green);
-            padding: 10px;
-            margin-bottom: 30px;
+            color: var(--hex-muted);
+        }
+
+        .hero h1 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .big-bracket-text {
+            font-size: 1.8rem;
+            text-align: center;
+            margin: 40px 0;
+            text-shadow: 0 0 10px rgba(94, 252, 135, 0.4);
+            opacity: 0; /* Hidden for animation */
+            animation: fadeIn 2s forwards 0.5s;
+        }
+
+        /* CONTENT SECTIONS */
+        section {
+            margin-bottom: 80px;
+            opacity: 0; /* Hidden initially for scroll reveal */
+            transform: translateY(20px);
+            transition: all 0.8s ease-out;
+            border-left: 2px solid var(--hex-dark-accent);
+            padding-left: 20px;
+        }
+
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-header {
+            border-bottom: 1px solid var(--hex-muted);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
+            align-items: end;
         }
 
+        .section-title { font-size: 1.2rem; }
+        .section-sub { font-size: 0.75rem; color: var(--hex-muted); }
+
+        /* CHECKLIST STYLES [cite: 221] */
         .checklist-item {
-            margin-bottom: 10px;
             display: flex;
             align-items: center;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
         }
-        .checklist-item::before {
-            content: "[ ]";
-            margin-right: 10px;
-            font-weight: bold;
+        .checklist-box {
+            width: 18px;
+            height: 18px;
+            border: 1px solid var(--hex-text);
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+        .checklist-box::after { content: ''; } 
 
-        .warning-box {
-            border: 1px dashed var(--terminal-green);
-            padding: 15px;
+        /* RISK CALCULATOR BOX [cite: 224] */
+        .code-block {
+            background-color: rgba(7, 22, 15, 0.8);
+            border: 1px solid var(--hex-muted);
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
             margin: 20px 0;
-            background: rgba(0, 255, 65, 0.05);
+            color: var(--hex-muted);
         }
+        .math-highlight { color: var(--hex-text); font-weight: bold; }
 
-        .redacted-block {
-            background-color: var(--terminal-green);
-            color: black;
-            padding: 2px 5px;
-            font-weight: bold;
+        /* REDACTED STYLES [cite: 106, 226] */
+        .redacted {
+            background-color: var(--hex-text);
+            color: var(--hex-bg);
+            padding: 0 4px;
             cursor: not-allowed;
             user-select: none;
         }
+        
+        .setup-card {
+            border: 1px dashed var(--hex-dark-accent);
+            padding: 15px;
+            margin-bottom: 15px;
+        }
 
-        .locked-section {
-            border: 1px solid var(--dim-green);
+        /* CTA BUTTON */
+        .armory-btn {
+            display: block;
+            background: transparent;
+            border: 1px solid var(--hex-text);
+            color: var(--hex-text);
             padding: 20px;
             text-align: center;
-            opacity: 0.7;
-            margin-top: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: 0.3s;
+            margin-top: 30px;
+        }
+        .armory-btn:hover {
+            background: var(--hex-text);
+            color: var(--hex-bg);
+            box-shadow: 0 0 15px var(--hex-text);
         }
 
-        .cta-btn {
-            background: var(--terminal-green);
-            color: black;
-            text-decoration: none;
-            padding: 10px 20px;
-            font-weight: bold;
-            display: inline-block;
-            margin-top: 10px;
+        /* UTILS */
+        .blinking-cursor::after {
+            content: '█';
+            animation: blink 1s infinite;
+            margin-left: 5px;
         }
+        @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0;} 100% {opacity: 1;} }
+        @keyframes fadeIn { to { opacity: 1; } }
+
     </style>
 </head>
 <body>
 
-    <div class="header-meta">
-        <span>IDENTITY: CONFIRMED</span>
-        <span>CLEARANCE: LEVEL-5</span>
+    <div class="grid-bg"></div>
+    <div class="scanlines"></div>
+    <div class="overlay"></div>
+
+    <div class="container">
+        
+        <div class="hero">
+            <div class="top-meta">
+                LAT 38.8977 N / LON 77.0365 W<br>
+                SYSTEM INTEGRITY: OPTIMAL
+            </div>
+
+            <h1 class="blinking-cursor">IDENTITY CONFIRMATION</h1>
+            <p class="text-muted" style="max-width: 500px;">
+                This protocol is minimal. It contains zero hype.<br>
+                It is designed for the Hunter.
+            </p>
+
+            <div class="big-bracket-text">
+                [ IF YOU KNOW, YOU KNOW ]
+            </div>
+
+            <p class="text-muted" style="margin-top: 20px; font-size: 0.8rem;">
+                We do not gamble. We execute.
+            </p>
+        </div>
+
+        <section>
+            <div class="section-header">
+                <span class="section-title">// 01. THE NO-GO ZONES</span>
+                <span class="section-sub">TIMING IS EVERYTHING</span>
+            </div>
+            <p style="margin-bottom: 15px;">Most losses don't come from bad entries. They come from bad timing. Stand down when:</p>
+            
+            <ul style="list-style: none; padding-left: 10px;">
+                <li class="checklist-item"><span style="color:red; margin-right:10px;">x</span> Price trapped between HTF support & resistance</li>
+                <li class="checklist-item"><span style="color:red; margin-right:10px;">x</span> Volume is declining while price chops</li>
+                <li class="checklist-item"><span style="color:red; margin-right:10px;">x</span> News window < 30 minutes (CPI, FOMC)</li>
+                <li class="checklist-item"><span style="color:red; margin-right:10px;">x</span> You are "bored" and looking for action</li>
+            </ul>
+            <p class="text-muted" style="font-size: 0.8rem; margin-top: 20px;">
+                RULE: NO SETUP IS A SETUP IF CONDITIONS AREN'T CLEAN.
+            </p>
+        </section>
+
+        <section>
+            <div class="section-header">
+                <span class="section-title">// 02. SNIPER ENTRY CHECKLIST</span>
+                <span class="section-sub">EXECUTE OR ABORT</span>
+            </div>
+
+            <div class="checklist-item"><div class="checklist-box"></div> HTF trend aligned (5m confirms 1h bias)</div>
+            <div class="checklist-item"><div class="checklist-box"></div> Clear level (support/resistance)</div>
+            <div class="checklist-item"><div class="checklist-box"></div> Liquidity sweep OR rejection candle</div>
+            <div class="checklist-item"><div class="checklist-box"></div> Volume expansion on entry</div>
+            <div class="checklist-item"><div class="checklist-box"></div> Stop defined before entry</div>
+            <div class="checklist-item"><div class="checklist-box"></div> Risk &le; 1-2% of account</div>
+            
+            <p class="text-muted" style="font-size: 0.8rem; margin-top: 20px; border-top: 1px solid var(--hex-dark-accent); padding-top: 10px;">
+                STATUS: One unchecked box = NO TRADE.
+            </p>
+        </section>
+
+        <section>
+            <div class="section-header">
+                <span class="section-title">// 03. POSITION SIZE FORMULA</span>
+                <span class="section-sub">NO EXCUSES</span>
+            </div>
+            
+            <p>If you can't calculate this in 10 seconds, you're gambling.</p>
+
+            <div class="code-block">
+                <p style="margin-bottom: 10px;">FORMULA:</p>
+                <span class="math-highlight">Account Balance</span> × <span class="math-highlight">Risk %</span> ÷ <span class="math-highlight">Stop Loss %</span> = Position Size
+            </div>
+
+            <div class="code-block" style="border-left: 3px solid var(--hex-text);">
+                <p style="font-size: 0.8rem; margin-bottom: 10px;">[ SIMULATION: LIVE FIRE EXERCISE ]</p>
+                Account: $1,000<br>
+                Risk: 1% ($10)<br>
+                Stop Loss: 0.5%<br><br>
+                <span class="math-highlight">>> OUTPUT: Position Size = $2,000</span>
+            </div>
+        </section>
+
+        <section>
+            <div class="section-header">
+                <span class="section-title">// 04. ATTACK PATTERNS</span>
+                <span class="section-sub">CLASSIFIED INTEL</span>
+            </div>
+
+            <div class="setup-card">
+                <strong>SETUP #1: LIQUIDITY SWEEP REVERSAL</strong>
+                <ol style="margin-left: 20px; font-size: 0.9rem; color: var(--hex-muted); margin-top: 5px;">
+                    <li>Market hunts stops (long wick)</li>
+                    <li>Rejection candle confirms</li>
+                    <li>Entry on retrace</li>
+                </ol>
+            </div>
+
+            <div class="setup-card">
+                <strong>SETUP #2: TREND PULLBACK CONTINUATION</strong>
+                <ol style="margin-left: 20px; font-size: 0.9rem; color: var(--hex-muted); margin-top: 5px;">
+                    <li>Strong impulse move</li>
+                    <li>Shallow pullback (drift, not crash)</li>
+                    <li>Volume expansion on re-entry</li>
+                </ol>
+            </div>
+
+            <div class="setup-card" style="opacity: 0.5; border-color: var(--hex-muted);">
+                <strong>SETUP #3: <span class="redacted">REDACTED</span></strong>
+                <div style="font-size: 0.8rem; margin-top: 5px;">[ ACCESS IN TERMINAL ]</div>
+            </div>
+
+            <div class="setup-card" style="opacity: 0.5; border-color: var(--hex-muted);">
+                <strong>SETUP #4: <span class="redacted">REDACTED</span></strong>
+                <div style="font-size: 0.8rem; margin-top: 5px;">[ ACCESS IN TERMINAL ]</div>
+            </div>
+        </section>
+
+        <section style="border-left: 2px solid var(--hex-text);">
+            <div class="section-header">
+                <span class="section-title" style="color: white;">// 05. THE ARMORY</span>
+                <span class="section-sub">FINAL DIRECTIVE</span>
+            </div>
+            
+            <p>These setups require fast execution, clean risk controls, and zero distractions.</p>
+            <p class="text-muted" style="margin-top: 10px;">
+                I execute them using the BingX Standard Futures interface—tight spreads, no clutter, no nonsense.
+            </p>
+
+            <a href="https://bingx.com/invite/YOUR_CODE" target="_blank" class="armory-btn">
+                [ OPEN YOUR ARMORY ]<br>
+                <span style="font-size: 0.7rem; font-weight: normal;">ACTIVATE ACCOUNT + UNLOCK DEPOSIT BONUS</span>
+            </a>
+
+            <div style="text-align: center; font-size: 0.6rem; color: var(--hex-muted); margin-top: 20px;">
+                DISCLAIMER: THIS MANUAL IS EDUCATION. RISK MANAGEMENT IS MANDATORY.
+            </div>
+        </section>
+
+        <br><br><br>
     </div>
 
-    <center>
-        <h3>THE BAGSEEKER'S PROTOCOL</h3>
-        <p style="font-size: 0.8rem; opacity: 0.8;">[ LIVE FIRE EXERCISE ]</p>
-    </center>
+    <script>
+        // Simple Intersection Observer to fade in sections as they scroll into view
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
 
-    <h2>// 01. THE NO-GO ZONES</h2>
-    <div class="warning-box">
-        <p><strong>RULE:</strong> No setup is a setup if conditions aren't clean.</p>
-    </div>
-    <ul style="list-style: none; padding: 0;">
-        <li class="checklist-item">Price trapped between HTF support/resistance</li>
-        <li class="checklist-item">News window < 30 minutes (CPI, FOMC)</li>
-        <li class="checklist-item">Emotion check: You are "bored" or looking for action</li>
-    </ul>
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target); // Only animate once
+                }
+            });
+        }, observerOptions);
 
-    <h2>// 02. SNIPER ENTRY CHECKLIST</h2>
-    <p>If all boxes aren't checked, you stand down.</p>
-    <br>
-    <div class="checklist-item">HTF trend aligned (5m confirms 1h bias)</div>
-    <div class="checklist-item">Liquidity sweep OR rejection candle</div>
-    <div class="checklist-item">Volume expansion on entry candle</div>
-    <div class="checklist-item">Risk &le; 1-2% of account</div>
-
-    <h2>// 03. ATTACK PATTERNS</h2>
-    
-    <p><strong>SETUP #1: LIQUIDITY SWEEP REVERSAL</strong></p>
-    <ol style="margin-left: 20px; margin-bottom: 20px;">
-        <li>Market hunts stops (long wick).</li>
-        <li>Rejection candle confirms.</li>
-        <li>Entry on retrace.</li>
-    </ol>
-
-    <p><strong>SETUP #2: TREND PULLBACK CONTINUATION</strong></p>
-    <ol style="margin-left: 20px;">
-        <li>Strong impulse move.</li>
-        <li>Shallow pullback (drift, not crash).</li>
-        <li>Volume expansion on re-entry.</li>
-    </ol>
-
-    <div class="locked-section">
-        <p style="margin-bottom: 10px;">REMAINING INTEL: CLASSIFIED</p>
-        <p>
-            SETUP #3: <span class="redacted-block">REDACTED</span><br>
-            SETUP #4: <span class="redacted-block">REDACTED</span><br>
-            SETUP #5: <span class="redacted-block">REDACTED</span>
-        </p>
-        <br>
-        <p style="font-size: 0.8rem;">FULL EXECUTION EXAMPLES INSIDE THE TERMINAL</p>
-        <a href="https://bingx.com/invite/YOUR_CODE" class="cta-btn">UNLOCK ALL DATA</a>
-    </div>
-
-    <br><br>
-    <center>
-        <a href="index.html" style="color: var(--terminal-green); font-size: 0.8rem;">&lt; RETURN TO BASE</a>
-    </center>
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+    </script>
 
 </body>
 </html>
