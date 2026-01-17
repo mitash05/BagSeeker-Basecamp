@@ -27,7 +27,12 @@
             overflow-x: hidden;
             font-size: 16px;
             line-height: 1.6;
-        }
+        
+            cursor: crosshair; /* Adds the sniper scope */
+}
+a, .armory-btn {
+    cursor: crosshair; /* Keeps it consistent on links */
+}
 
         /* TACTICAL GRID BACKGROUND  */
         .grid-bg {
@@ -382,26 +387,70 @@
     </div>
 
     <script>
-        // Simple Intersection Observer to fade in sections as they scroll into view
-        const observerOptions = {
-            root: null,
-            rootMargin: '0px',
-            threshold: 0.1
-        };
+    /* 1. SCROLL ANIMATIONS (Fade in sections) */
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+    };
 
-        const observer = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                    observer.unobserve(entry.target); // Only animate once
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('section').forEach(section => {
-            observer.observe(section);
+    const scrollObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                scrollObserver.unobserve(entry.target); // Only animate once
+            }
         });
-    </script>
+    }, observerOptions);
 
+    document.querySelectorAll('section').forEach(section => {
+        scrollObserver.observe(section);
+    });
+
+
+    /* 2. DECRYPTION EFFECT (For Redacted Text) */
+    const cipherChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%&";
+    
+    // Setup the redacted elements
+    document.querySelectorAll(".redacted").forEach(el => {
+        el.dataset.value = el.innerText; // Store the original text (e.g., "REDACTED")
+        el.classList.add("cipher"); // Ensure it has styling if needed
+    });
+
+    function animateCipher(element) {
+        let iterations = 0;
+        const originalText = element.dataset.value;
+        
+        // If there is no text to animate, stop
+        if(!originalText) return;
+
+        const interval = setInterval(() => {
+            element.innerText = originalText.split("")
+                .map((letter, index) => {
+                    if(index < iterations) return originalText[index];
+                    return cipherChars[Math.floor(Math.random() * cipherChars.length)];
+                }).join("");
+            
+            if(iterations >= originalText.length) clearInterval(interval);
+            
+            iterations += 1 / 3;
+        }, 30);
+    }
+
+    // Trigger decryption when element enters view
+    const cipherObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting) {
+                animateCipher(entry.target);
+            }
+        });
+    }, { threshold: 1.0 });
+
+    document.querySelectorAll(".redacted").forEach(element => {
+        cipherObserver.observe(element);
+        // Also trigger on mouse hover for fun
+        element.onmouseover = () => animateCipher(element);
+    });
+</script>
 </body>
 </html>
