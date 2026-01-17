@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BAGSEEKER // PLATFORM INTEL</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --hex-bg: rgb(7, 22, 15);
+            --hex-grid: rgb(32, 49, 38);
+            --hex-text: rgb(94, 252, 135);
+            --hex-muted: rgb(123, 156, 135);
+            --hex-dark-accent: rgb(39, 63, 44);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--hex-bg);
+            color: var(--hex-text);
+            font-family: 'JetBrains Mono', monospace;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* NAVIGATION BACK */
+        .nav-back {
+            position: absolute; top: 20px; left: 20px;
+            text-decoration: none; color: var(--hex-muted); font-size: 0.8rem;
+            border: 1px solid var(--hex-dark-accent); padding: 5px 15px;
+            transition: 0.3s;
+        }
+        .nav-back:hover { color: var(--hex-text); border-color: var(--hex-text); }
+
+        /* HEADER */
+        header { text-align: center; margin-bottom: 60px; max-width: 600px; }
+        h1 { font-size: 2.5rem; text-transform: uppercase; margin-bottom: 10px; letter-spacing: -2px; }
+        .sub-head { color: var(--hex-muted); font-size: 0.9rem; border-bottom: 1px dashed var(--hex-dark-accent); padding-bottom: 20px; display: inline-block; }
+
+        /* GRID LAYOUT */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        /* CARDS */
+        .intel-card {
+            background: rgba(32, 49, 38, 0.3);
+            border: 1px solid var(--hex-dark-accent);
+            padding: 25px;
+            position: relative;
+            transition: 0.3s;
+        }
+        .intel-card:hover {
+            border-color: var(--hex-text);
+            box-shadow: 0 0 20px rgba(94, 252, 135, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .card-icon { font-size: 2rem; margin-bottom: 15px; display: block; }
+        .card-title { font-size: 1.1rem; text-transform: uppercase; margin-bottom: 10px; font-weight: bold; }
+        .card-desc { font-size: 0.85rem; color: var(--hex-muted); line-height: 1.6; }
+
+        /* STAT BARS */
+        .stat-row { display: flex; justify-content: space-between; margin-top: 15px; font-size: 0.75rem; color: var(--hex-muted); }
+        .bar-container { width: 100px; height: 6px; background: var(--hex-dark-accent); margin-top: 6px; }
+        .bar-fill { height: 100%; background: var(--hex-text); }
+
+        /* CTA AREA */
+        .cta-section {
+            margin-top: 60px;
+            text-align: center;
+            border: 1px solid var(--hex-text);
+            padding: 40px;
+            width: 100%; max-width: 600px;
+            background: rgba(94, 252, 135, 0.05);
+        }
+
+        .btn-join {
+            background: var(--hex-text); color: var(--hex-bg);
+            padding: 15px 30px; text-decoration: none; font-weight: bold;
+            display: inline-block; margin-top: 20px; text-transform: uppercase;
+            transition: 0.3s;
+        }
+        .btn-join:hover { box-shadow: 0 0 20px var(--hex-text); }
+
+    </style>
+</head>
+<body>
+
+    <a href="home.html" class="nav-back">< MISSION CONTROL</a>
+
+    <header>
+        <h1>TARGET: BingX</h1>
+        <div class="sub-head">INTELLIGENCE REPORT // WHY WE DEPLOY HERE</div>
+    </header>
+
+    <div class="grid-container">
+        <div class="intel-card">
+            <span class="card-icon">⚡</span>
+            <div class="card-title">Execution Velocity</div>
+            <p class="card-desc">
+                In high-volatility environments, lag kills. BingX provides institutional-grade matching engines. We don't miss entries because of server overload.
+            </p>
+            <div class="stat-row">
+                <span>LATENCY</span>
+                <div class="bar-container"><div class="bar-fill" style="width: 95%;"></div></div>
+            </div>
+        </div>
+
+        <div class="intel-card">
+            <span class="card-icon">🛡️</span>
+            <div class="card-title">Standard Futures</div>
+            <p class="card-desc">
+                The ultimate tool for risk management. Unlike Perpetual Futures, Standard Futures allow for isolated positions with easier margin calculations.
+            </p>
+        </div>
+
+        <div class="intel-card">
+            <span class="card-icon">💎</span>
+            <div class="card-title">Commodities + Crypto</div>
+            <p class="card-desc">
+                A Hunter doesn't limit their hunting ground. Trade BTC, ETH, Gold, and Forex pairs from a single dashboard.
+            </p>
+        </div>
+
+        <div class="intel-card">
+            <span class="card-icon">📉</span>
+            <div class="card-title">Low Friction (Fees)</div>
+            <p class="card-desc">
+                High fees bleed your PnL dry. BingX offers competitive maker/taker fees, ensuring you keep more of the kill.
+            </p>
+            <div class="stat-row">
+                <span>COST EFFICIENCY</span>
+                <div class="bar-container"><div class="bar-fill" style="width: 90%;"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="cta-section">
+        <h2 style="font-size: 1.5rem; margin-bottom: 10px;">DEPLOYMENT READY?</h2>
+        <p style="color: var(--hex-muted); font-size: 0.9rem;">
+            Sign up via The Bagseeker link to unlock exclusive deposit bonuses and fee rebates.
+        </p>
+        <a href="https://bingx.com/invite/YOUR_CODE" target="_blank" class="btn-join">
+            INITIALIZE ACCOUNT
+        </a>
+    </div>
+
+</body>
+</html>
