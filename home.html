@@ -13,6 +13,7 @@
             --hex-text: rgb(94, 252, 135);
             --hex-muted: rgb(123, 156, 135);
             --hex-dark-accent: rgb(39, 63, 44);
+            --hex-alert: rgb(255, 60, 60);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -22,466 +23,179 @@
             color: var(--hex-text);
             font-family: 'JetBrains Mono', monospace;
             height: 100vh;
-            overflow: hidden; /* No scrolling on dashboard */
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             cursor: crosshair;
         }
 
-        /* --- HUD LAYOUT --- */
-        .hud-header {
-            height: 60px;
-            border-bottom: 1px solid var(--hex-dark-accent);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 30px;
-            background: rgba(7, 22, 15, 0.9);
-            z-index: 10;
+        /* LIVE TICKER (Slower Speed) */
+        #ticker-wrap {
+            position: fixed; top: 0; left: 0; width: 100%; height: 28px; 
+            background: #000; border-bottom: 1px solid var(--hex-dark-accent); 
+            z-index: 9999; overflow: hidden; white-space: nowrap;
+            display: flex; align-items: center;
         }
-
-        .hud-brand { font-size: 1.2rem; font-weight: bold; letter-spacing: -1px; }
-        .hud-meta { font-size: 0.75rem; color: var(--hex-muted); display: flex; gap: 20px; }
-        
-        .hud-footer {
-            height: 40px;
-            border-top: 1px solid var(--hex-dark-accent);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 0.7rem;
-            color: var(--hex-muted);
-            z-index: 10;
-            background: var(--hex-bg);
-        }
-
-        /* --- MAIN INTERFACE SPLIT --- */
-        .main-stage {
-            flex: 1;
-            display: flex;
-            position: relative;
-        }
-
-        .split-zone {
-            flex: 1;
-            position: relative;
-            border-right: 1px solid var(--hex-dark-accent);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none; /* It's a link */
-            color: var(--hex-text);
-        }
-        
-        .split-zone:last-child { border-right: none; }
-
-        /* Hover Interaction: One grows, one shrinks */
-        .main-stage:hover .split-zone { opacity: 0.3; filter: blur(2px); }
-        .main-stage .split-zone:hover { 
-            opacity: 1; 
-            filter: blur(0px); 
-            flex: 1.5; /* Grow effect */
-            background: rgba(94, 252, 135, 0.02);
-        }
-
-        /* Zone Content */
-        .zone-content {
-            text-align: center;
-            z-index: 5;
-            transform: translateY(20px);
-            transition: 0.4s;
-            padding: 20px;
-            border: 1px solid transparent;
-        }
-
-        .split-zone:hover .zone-content {
-            transform: translateY(0);
-            border: 1px dashed var(--hex-text);
-            background: rgba(7, 22, 15, 0.8);
-        }
-
-        .zone-title {
-            font-size: 2.5rem;
-            text-transform: uppercase;
-            font-weight: 700;
-            margin-bottom: 10px;
-            text-shadow: 0 0 20px rgba(0,0,0,0.8);
-        }
-
-        .zone-desc {
-            font-size: 0.9rem;
-            color: var(--hex-muted);
-            max-width: 300px;
-            margin: 0 auto;
-            opacity: 0; /* Hidden until hover */
-            transform: translateY(10px);
-            transition: 0.3s;
-        }
-
-        .split-zone:hover .zone-desc {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* --- BACKGROUND ELEMENTS --- */
-        .grid-bg {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                linear-gradient(var(--hex-grid) 1px, transparent 1px),
-                linear-gradient(90deg, var(--hex-grid) 1px, transparent 1px);
-            background-size: 40px 40px;
-            opacity: 0.4;
-            z-index: 0;
-            pointer-events: none;
-        }
-        
-        /* Tactical Crosshair Overlay */
-        .crosshair-overlay {
-            position: absolute; inset: 0; pointer-events: none; z-index: 2;
-        }
-        .crosshair-center {
-            position: absolute; top: 50%; left: 50%;
-            width: 20px; height: 20px;
-            transform: translate(-50%, -50%);
-        }
-        .crosshair-center::before, .crosshair-center::after {
-            content: ''; position: absolute; background: var(--hex-muted);
-        }
-        .crosshair-center::before { width: 1px; height: 20px; left: 50%; }
-        .crosshair-center::after { width: 20px; height: 1px; top: 50%; }
-
-        /* --- DECORATIVE TEXT --- */
-        .bg-text {
-            position: absolute;
-            font-size: 8rem;
-            opacity: 0.05;
-            font-weight: 900;
-            pointer-events: none;
-            z-index: 1;
-            white-space: nowrap;
-        }
-        .bg-left { top: 20%; left: -50px; transform: rotate(-90deg); }
-        .bg-right { bottom: 20%; right: -50px; transform: rotate(90deg); }
-
-        /* --- MOBILE RESPONSIVE --- */
-        @media (max-width: 768px) {
-            .main-stage { flex-direction: column; }
-            .split-zone { border-right: none; border-bottom: 1px solid var(--hex-dark-accent); }
-            .bg-text { display: none; }
-            .zone-desc { opacity: 1; transform: translateY(0); } /* Always show desc on mobile */
-            .zone-title { font-size: 1.8rem; }
-        }
-
-        /* --- NEW ADDITIONS FOR TRI-SPLIT --- */
-        
-        /* 1. Center Column Background Text */
-        .bg-center { 
-            position: absolute;
-            top: 50%; left: 50%; 
-            transform: translate(-50%, -50%); 
-            font-size: 6rem;
-            opacity: 0.05;
-            font-weight: 900;
-            pointer-events: none;
-            z-index: 1;
-            white-space: nowrap;
-        }
-
-        /* 2. Generic Button Style for the Zones */
-        .access-btn {
-            margin-top: 20px; 
-            font-size: 0.7rem; 
-            color: var(--hex-text); 
-            border: 1px solid var(--hex-text); 
+        #ticker-move {
             display: inline-block; 
-            padding: 5px 10px;
-            text-transform: uppercase;
-            transition: 0.3s;
+            animation: tickerScroll 60s linear infinite; /* SLOWED DOWN from 20s to 60s */
+            padding-left: 100%;
+        }
+        .ticker-item { margin-right: 50px; font-size: 0.75rem; color: #ccc; }
+        @keyframes tickerScroll { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
+
+        /* MAIN HUD CONTAINER */
+        .hud-container {
+            flex: 1;
+            margin-top: 30px; /* Space for ticker */
+            display: grid;
+            grid-template-columns: 1fr 300px 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 20px;
+            padding: 30px;
+            position: relative;
+        }
+
+        /* CENTER RADAR (Visual Only) */
+        .center-radar {
+            grid-column: 2; grid-row: 1 / span 2;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border: 1px dashed var(--hex-dark-accent);
+            border-radius: 50%;
+            aspect-ratio: 1/1;
+            align-self: center;
+            position: relative;
         }
         
-        /* Hover effect for the button */
-        .split-zone:hover .access-btn {
-            background: var(--hex-text);
-            color: var(--hex-bg);
+        .radar-sweep {
+            position: absolute; width: 100%; height: 100%; border-radius: 50%;
+            background: conic-gradient(from 0deg, transparent 0deg, rgba(94, 252, 135, 0.1) 60deg, transparent 60deg);
+            animation: radarSpin 4s linear infinite;
         }
-
-        /* 3. Mobile Updates for 3 Columns */
-        @media (max-width: 768px) {
-            .bg-center { display: none; }
-            /* Ensure all 3 zones stack vertically and look even */
-            .split-zone { 
-                min-height: 33vh; 
-                border-bottom: 1px solid var(--hex-dark-accent);
-                border-right: none;
-            }
-        }
-        /* --- CLASSIFIED ALERT BUTTON STYLES --- */
-.classified-alert {
-    position: fixed;
-    bottom: 60px; /* Sits just above the footer */
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(255, 60, 60, 0.1); /* Low opacity red */
-    border: 1px solid #ff3c3c;
-    color: #ff3c3c;
-    padding: 12px 25px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    text-decoration: none;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    z-index: 999;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(2px);
-    
-    /* Breathing Animation */
-    animation: pulseAlert 3s infinite;
-}
-
-.classified-alert:hover {
-    background: #ff3c3c;
-    color: #000;
-    box-shadow: 0 0 30px #ff3c3c;
-    cursor: alias;
-}
-
-.blink { animation: blinker 1s linear infinite; margin-right: 8px; }
-
-@keyframes pulseAlert {
-    0% { box-shadow: 0 0 0 rgba(255, 60, 60, 0); border-color: rgba(255, 60, 60, 0.5); }
-    50% { box-shadow: 0 0 20px rgba(255, 60, 60, 0.3); border-color: #ff3c3c; }
-    100% { box-shadow: 0 0 0 rgba(255, 60, 60, 0); border-color: rgba(255, 60, 60, 0.5); }
-}
-
-@keyframes blinker { 50% { opacity: 0; } }
-
-/* Mobile Adjustments */
-@media (max-width: 768px) {
-    .classified-alert {
-        width: 90%;
-        text-align: center;
-        bottom: 50px;
-    }
-}
+        @keyframes radarSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         
+        .center-logo { font-size: 1.5rem; font-weight: bold; z-index: 2; text-shadow: 0 0 10px var(--hex-text); }
+
+        /* COMMAND MODULES (The Buttons) */
+        .cmd-module {
+            border: 1px solid var(--hex-dark-accent);
+            background: rgba(7, 22, 15, 0.8);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-decoration: none; color: var(--hex-text);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cmd-module:hover {
+            border-color: var(--hex-text);
+            box-shadow: 0 0 20px rgba(94, 252, 135, 0.1);
+            background: rgba(32, 49, 38, 0.5);
+        }
+
+        .module-icon { font-size: 2.5rem; margin-bottom: 10px; transition: 0.3s; }
+        .cmd-module:hover .module-icon { transform: scale(1.2); }
+        .module-title { font-size: 1.2rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
+        .module-sub { font-size: 0.7rem; color: var(--hex-muted); margin-top: 5px; }
+
+        /* CORNER PLACEMENTS */
+        .tl { grid-column: 1; grid-row: 1; border-top-left-radius: 30px; }
+        .tr { grid-column: 3; grid-row: 1; border-top-right-radius: 30px; }
+        .bl { grid-column: 1; grid-row: 2; border-bottom-left-radius: 30px; }
+        .br { grid-column: 3; grid-row: 2; border-bottom-right-radius: 30px; }
+
+        /* MOBILE FIX */
+        @media (max-width: 900px) {
+            .hud-container { display: flex; flex-direction: column; height: auto; overflow-y: auto; }
+            .center-radar { display: none; } /* Hide radar on mobile */
+            .cmd-module { padding: 40px; min-height: 150px; border-radius: 0 !important; }
+        }
+
+        /* SUPPLY DROP BUTTON (PROMOS) */
+        .supply-drop {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: var(--hex-text); color: var(--hex-bg);
+            padding: 10px 30px; font-weight: bold; text-decoration: none;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            transition: 0.3s; animation: pulse 2s infinite;
+        }
+        .supply-drop:hover { padding: 10px 40px; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 rgba(94,252,135,0.7); } 70% { box-shadow: 0 0 20px rgba(94,252,135,0); } 100% { box-shadow: 0 0 0 rgba(94,252,135,0); } }
+
     </style>
 </head>
 <body>
-<div id="ticker-wrap" style="
-    position: fixed; top: 0; left: 0; width: 100%; height: 30px; 
-    background: #000; border-bottom: 1px solid #333; 
-    z-index: 9999; overflow: hidden; white-space: nowrap;
-    display: flex; align-items: center;
-">
-    <div id="ticker-move" style="
-        display: inline-block; 
-        animation: tickerScroll 20s linear infinite;
-        padding-left: 100%;
-        font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
-    ">
-        <span style="color: #666;">INITIALIZING FEED...</span>
+
+    <div id="ticker-wrap">
+        <div id="ticker-move">INITIALIZING FEED...</div>
     </div>
-</div>
 
-<style>
-    @keyframes tickerScroll {
-        0% { transform: translate3d(0, 0, 0); }
-        100% { transform: translate3d(-100%, 0, 0); }
-    }
-    
-    /* Push body down so ticker doesn't cover content */
-    body { padding-top: 30px !important; } 
-    
-    .ticker-item { margin-right: 30px; color: #fff; }
-    .ticker-up { color: #5EFC87; }
-    .ticker-down { color: #ff3c3c; }
-</style>
+    <div class="hud-container">
 
-<script>
-    /* --- REPLACEMENT TICKER SCRIPT --- */
-async function fetchPrices() {
-    // EXPANDED LIST
-    const pairs = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT', 'ADAUSDT', 'DOGEUSDT', 'AVAXUSDT', 'DOTUSDT', 'LINKUSDT'];
-    const display = document.getElementById('ticker-move');
-    
-    try {
-        const response = await fetch('https://api.binance.com/api/v3/ticker/price');
-        const data = await response.json();
-        
-        let html = '';
-        
-        pairs.forEach(pair => {
-            const item = data.find(d => d.symbol === pair);
-            if(item) {
-                // Formatting: remove trailing zeros
-                let price = parseFloat(item.price);
-                // If price < 1, show 4 decimals, else 2
-                price = price < 1 ? price.toFixed(4) : price.toFixed(2);
-                
-                const name = pair.replace('USDT', '');
-                
-                html += `<span class="ticker-item">
-                    <span style="font-weight:bold; color: #7B9C87;">${name}</span> 
-                    $${price}
-                </span>`;
-            }
-        });
-        
-        html += `<span class="ticker-item" style="color:#5EFC87;">[ SYSTEM: ONLINE ]</span>`;
-        display.innerHTML = html;
-        
-    } catch (e) {
-        console.log('Ticker offline');
-    }
-}
+        <a href="basecamp.html" class="cmd-module tl">
+            <div class="module-icon">⌖</div>
+            <div class="module-title">BASE CAMP</div>
+            <div class="module-sub">TERMINAL // EXECUTION</div>
+        </a>
 
-    // Update every 5 seconds
-    fetchPrices();
-    setInterval(fetchPrices, 5000);
-</script>
-    
-    <header class="hud-header">
-        <div class="hud-brand">THE BAGSEEKER <span style="font-size: 0.5em; vertical-align: super; color: var(--hex-muted);">TM</span></div>
-        <div class="hud-meta">
-            <span id="clock">00:00:00 UTC</span>
-            <span style="color: var(--hex-text);">● ONLINE</span>
-        </div>
-    </header>
-
-    <div style="
-    background: rgba(32, 49, 38, 0.6); 
-    border-bottom: 1px solid var(--hex-dark-accent);
-    padding: 10px 30px;
-    font-size: 0.8rem;
-    display: flex; justify-content: space-between; align-items: center;
-">
-    <div style="color: var(--hex-muted);">
-        <span style="color: var(--hex-text); margin-right: 10px;">⚡ ACTIVE OPS:</span>
-        <span id="promo-text">Scanning for bonuses...</span>
-    </div>
-    <a href="https://bingx.com/en-us/mission/" target="_blank" style="color: var(--hex-text); text-decoration: none; border-bottom: 1px dotted var(--hex-text);">
-        CLAIM REWARDS >
-    </a>
-</div>
-
-<script>
-    // Rotates through known standard campaigns to simulate a live feed
-    const promos = [
-        "NEW USER REWARD: Up to 5,000 USDT in Mystery Boxes",
-        "TRADING COMPETITION: 100k USDT Prize Pool Active",
-        "DEPOSIT BONUS: 20% Rebate on First Transfer",
-        "COPY TRADING: Subsidy Vouchers Available"
-    ];
-    
-    let pIndex = 0;
-    setInterval(() => {
-        const el = document.getElementById('promo-text');
-        el.style.opacity = 0;
-        setTimeout(() => {
-            el.innerText = promos[pIndex];
-            el.style.opacity = 1;
-            pIndex = (pIndex + 1) % promos.length;
-        }, 500);
-    }, 4000);
-    
-    // Init first run
-    document.getElementById('promo-text').innerText = promos[0];
-</script>
-    
-    <main class="main-stage">
-        
-        <div class="grid-bg"></div>
-        <div class="crosshair-overlay">
-            <div class="crosshair-center"></div>
+        <div class="center-radar">
+            <div class="radar-sweep"></div>
+            <div class="center-logo">BAGSEEKER</div>
+            <div style="font-size: 0.6rem; margin-top: 5px; color: var(--hex-muted);">SYSTEM ONLINE</div>
         </div>
 
-        <a href="basecamp.html" class="split-zone" id="zone-left">
-            <div class="bg-text bg-left">OPERATIONS</div>
-            <div class="zone-content">
-                <div style="font-size: 3rem; margin-bottom: 10px;">⌖</div>
-                <div class="zone-title glitch" data-text="BASE CAMP">BASE CAMP</div>
-                <p class="zone-desc">
-                    Active Trading Terminal.<br>
-                    Daily Signals.
-                </p>
-                <div class="access-btn">ACCESS ></div>
-            </div>
+        <a href="market.html" class="cmd-module tr">
+            <div class="module-icon">⚡</div>
+            <div class="module-title">MARKETS</div>
+            <div class="module-sub">LIVE FEED // 16 ASSETS</div>
         </a>
 
-        <a href="intel.html" class="split-zone" id="zone-mid">
-            <div class="bg-text bg-center">INTEL</div>
-            <div class="zone-content">
-                <div style="font-size: 3rem; margin-bottom: 10px;">⚡</div>
-                <div class="zone-title glitch" data-text="INTEL">INTEL</div>
-                <p class="zone-desc">
-                    Platform Specs.<br>
-                    Why BingX.<br>
-                    Speed & Fees.
-                </p>
-                <div class="access-btn">VIEW REPORT ></div>
-            </div>
+        <a href="intel.html" class="cmd-module bl">
+            <div class="module-icon">MQ</div>
+            <div class="module-title">INTEL</div>
+            <div class="module-sub">PLATFORM DATA // SPECS</div>
         </a>
 
-        <a href="protocol.html" class="split-zone" id="zone-right">
-            <div class="bg-text bg-right">KNOWLEDGE</div>
-            <div class="zone-content">
-                <div style="font-size: 3rem; margin-bottom: 10px;">≣</div>
-                <div class="zone-title glitch" data-text="PROTOCOL">PROTOCOL</div>
-                <p class="zone-desc">
-                    The Hunter's Manual.<br>
-                    Risk Management.
-                </p>
-                <div class="access-btn">OPEN FILE ></div>
-            </div>
+        <a href="protocol.html" class="cmd-module br">
+            <div class="module-icon">≣</div>
+            <div class="module-title">PROTOCOL</div>
+            <div class="module-sub">THE MANUAL // STRATEGY</div>
         </a>
 
-    </main>
+        <a href="promos.html" class="supply-drop">
+            ⚠ ACTIVE BOUNTIES (PROMOS)
+        </a>
 
-    <footer class="hud-footer">
-        // SECURE CONNECTION ESTABLISHED // LAT 38.89 N // NO GAMBLING PERMITTED
-    </footer>
+    </div>
 
     <script>
-        // 1. Clock functionality
-        function updateClock() {
-            const now = new Date();
-            const timeString = now.toISOString().split('T')[1].split('.')[0];
-            document.getElementById('clock').innerText = timeString + " UTC";
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-
-        // 2. Glitch Effect on Hover
-        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890#";
-        
-        document.querySelectorAll('.glitch').forEach(el => {
-            el.addEventListener('mouseover', event => {
-                let iterations = 0;
-                const originalText = el.dataset.text;
+        // EXPANDED TICKER SCRIPT
+        async function fetchPrices() {
+            // New List of Assets
+            const pairs = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT', 'ADAUSDT', 'DOGEUSDT', 'AVAXUSDT', 'DOTUSDT', 'LINKUSDT', 'MATICUSDT', 'SHIBUSDT', 'LTCUSDT', 'BCHUSDT'];
+            const display = document.getElementById('ticker-move');
+            
+            try {
+                const response = await fetch('https://api.binance.com/api/v3/ticker/price');
+                const data = await response.json();
                 
-                const interval = setInterval(() => {
-                    event.target.innerText = originalText.split("")
-                        .map((letter, index) => {
-                            if(index < iterations) return originalText[index];
-                            return letters[Math.floor(Math.random() * letters.length)];
-                        })
-                        .join("");
-                    
-                    if(iterations >= originalText.length) clearInterval(interval);
-                    iterations += 1 / 3;
-                }, 30);
-            });
-        });
-
-        // 3. Audio Effect (Optional - won't play without user interaction policy, but good for "Genius" feel)
-        // Note: Browsers block auto-audio, so we'd usually attach this to the first click.
+                let html = '';
+                
+                pairs.forEach(pair => {
+                    const item = data.find(d => d.symbol === pair);
+                    if(item) {
+                        let price = parseFloat(item.price);
+                        price = price < 1 ? price.toFixed(4) : price.toFixed(2);
+                        const name = pair.replace('USDT', '');
+                        html += `<span class="ticker-item"><strong style="color:#7B9C87">${name}</strong> $${price}</span>`;
+                    }
+                });
+                
+                display.innerHTML = html;
+            } catch (e) { console.log('Ticker offline'); }
+        }
+        fetchPrices();
+        setInterval(fetchPrices, 60000); // Update prices every minute to save bandwidth
     </script>
-    
-    <a href="strategy.html" class="classified-alert">
-    <span class="blink">⚠</span> DETECTED: "99%" STRATEGY FILE
-</a>
-
 </body>
 </html>
