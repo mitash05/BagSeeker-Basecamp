@@ -8,159 +8,93 @@
     
     <style>
         :root {
-            --hex-bg: rgb(7, 22, 15);
-            --hex-grid: rgb(32, 49, 38);
-            --hex-text: rgb(94, 252, 135);
-            --hex-gold: rgb(255, 215, 0);
-            --hex-muted: rgb(123, 156, 135);
-            --hex-dark-accent: rgb(39, 63, 44);
+            --hex-bg: #07160F;
+            --hex-grid: #203126;
+            --hex-text: #5EFC87;
+            --hex-gold: #FFD700;
+            --hex-muted: #7B9C87;
+            --hex-dark-accent: #273F2C;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
-            background-color: var(--hex-bg);
-            color: var(--hex-text);
-            font-family: 'JetBrains Mono', monospace;
-            padding: 40px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+            background-color: var(--hex-bg); color: var(--hex-text); font-family: 'JetBrains Mono', monospace;
+            padding: 40px 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh;
         }
-
-        /* TACTICAL BACKGROUND */
         .grid-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                linear-gradient(var(--hex-grid) 1px, transparent 1px),
-                linear-gradient(90deg, var(--hex-grid) 1px, transparent 1px);
+            background-image: linear-gradient(var(--hex-grid) 1px, transparent 1px), linear-gradient(90deg, var(--hex-grid) 1px, transparent 1px);
             background-size: 40px 40px; opacity: 0.3; z-index: -1;
         }
-
-        .nav-back {
-            position: fixed; top: 20px; left: 20px;
-            text-decoration: none; color: var(--hex-muted); font-size: 0.8rem;
-            border: 1px solid var(--hex-dark-accent); padding: 5px 15px;
-            background: var(--hex-bg); z-index: 100;
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px; z-index: 10; pointer-events: none; opacity: 0.4;
         }
+
+        .nav-back { position: fixed; top: 20px; left: 20px; text-decoration: none; color: var(--hex-muted); font-size: 0.8rem; border: 1px solid var(--hex-dark-accent); padding: 5px 15px; background: var(--hex-bg); z-index: 100; }
         .nav-back:hover { color: var(--hex-text); border-color: var(--hex-text); }
 
-        /* HEADER */
         header { text-align: center; margin-bottom: 50px; max-width: 800px; border-bottom: 2px solid var(--hex-text); padding-bottom: 20px; }
         h1 { font-size: 2.5rem; margin-bottom: 10px; color: var(--hex-gold); text-transform: uppercase; letter-spacing: -2px; text-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
         .sub-text { color: var(--hex-muted); font-size: 0.9rem; }
 
-        /* BOUNTY GRID */
-        .bounty-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            width: 100%; max-width: 1000px;
-        }
-
-        /* BOUNTY CARD */
+        .bounty-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; width: 100%; max-width: 1000px; }
         .bounty-card {
-            background: rgba(7, 22, 15, 0.9);
-            border: 1px dashed var(--hex-muted);
-            padding: 25px;
-            position: relative;
-            transition: 0.3s;
-            overflow: hidden;
+            background: rgba(7, 22, 15, 0.9); border: 1px dashed var(--hex-muted); padding: 25px;
+            position: relative; transition: 0.3s; overflow: hidden;
         }
-        
-        .bounty-card::before {
-            content: 'CONTRACT'; position: absolute; top: 10px; right: 10px;
-            font-size: 0.6rem; color: var(--hex-dark-accent); border: 1px solid var(--hex-dark-accent); padding: 2px 6px;
-        }
-
-        .bounty-card:hover {
-            border-color: var(--hex-gold);
-            transform: translateY(-5px);
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
-        }
+        .bounty-card::before { content: 'CONTRACT'; position: absolute; top: 10px; right: 10px; font-size: 0.6rem; color: var(--hex-dark-accent); border: 1px solid var(--hex-dark-accent); padding: 2px 6px; }
+        .bounty-card:hover { border-color: var(--hex-gold); transform: translateY(-5px); box-shadow: 0 0 20px rgba(255, 215, 0, 0.1); }
 
         .reward-amount { font-size: 2rem; color: var(--hex-gold); font-weight: bold; margin: 15px 0; }
         .bounty-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
         .bounty-desc { font-size: 0.85rem; color: var(--hex-muted); line-height: 1.5; margin-bottom: 20px; }
-
         .progress-bar { width: 100%; height: 4px; background: var(--hex-dark-accent); margin-bottom: 15px; position: relative; }
         .progress-fill { height: 100%; background: var(--hex-text); width: 0%; animation: loadBar 2s forwards; }
-
-        .claim-btn {
-            display: block; width: 100%; text-align: center;
-            background: transparent; color: var(--hex-text);
-            border: 1px solid var(--hex-text); padding: 10px;
-            text-decoration: none; text-transform: uppercase; font-size: 0.8rem; font-weight: bold;
-            transition: 0.3s;
-        }
+        .claim-btn { display: block; width: 100%; text-align: center; background: transparent; color: var(--hex-text); border: 1px solid var(--hex-text); padding: 10px; text-decoration: none; text-transform: uppercase; font-size: 0.8rem; font-weight: bold; transition: 0.3s; }
         .claim-btn:hover { background: var(--hex-text); color: var(--hex-bg); }
-
         @keyframes loadBar { from { width: 0; } to { width: 30%; } }
-
     </style>
 </head>
 <body>
-
-    <div class="grid-bg"></div>
+    <div class="grid-bg"></div><div class="scanlines"></div>
     <a href="home.html" class="nav-back">< MISSION CONTROL</a>
 
     <header>
         <h1>ACTIVE BOUNTIES</h1>
-        <p class="sub-text">
-            // STATUS: HIGH VALUE TARGETS DETECTED<br>
-            // CLAIM THESE REWARDS UPON DEPLOYMENT
-        </p>
+        <p class="sub-text">// STATUS: HIGH VALUE TARGETS DETECTED<br>// CLAIM THESE REWARDS UPON DEPLOYMENT</p>
     </header>
 
     <div class="bounty-grid">
-
         <div class="bounty-card">
             <div class="bounty-title">New User Welcome</div>
             <div class="reward-amount">5,125 USDT</div>
-            <p class="bounty-desc">
-                Execute registration and complete KYC. Unlock Mystery Boxes containing randomized USDT rewards.
-            </p>
+            <p class="bounty-desc">Execute registration and complete KYC. Unlock Mystery Boxes containing randomized USDT rewards.</p>
             <div class="progress-bar"><div class="progress-fill" style="width: 10%;"></div></div>
             <a href="https://bingx.com/invite/YOUR_CODE" target="_blank" class="claim-btn">CLAIM MYSTERY BOX</a>
         </div>
-
         <div class="bounty-card">
             <div class="bounty-title">First Deposit Op</div>
             <div class="reward-amount">+20% REBATE</div>
-            <p class="bounty-desc">
-                Deposit minimum 100 USDT. Protocol grants a 20% rebate voucher on trading fees instantly.
-            </p>
+            <p class="bounty-desc">Deposit minimum 100 USDT. Protocol grants a 20% rebate voucher on trading fees instantly.</p>
             <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
             <a href="https://bingx.com/invite/YOUR_CODE" target="_blank" class="claim-btn">INITIATE DEPOSIT</a>
         </div>
-
         <div class="bounty-card" style="border-color: var(--hex-gold);">
             <div class="bounty-title">Futures Volume Tier 1</div>
             <div class="reward-amount">200 USDT</div>
-            <p class="bounty-desc">
-                <span style="color: var(--hex-gold);">>> OBJECTIVE:</span> Trade 20,000 USDT volume.<br>
-                Reward distributed as Trial Fund for risk-free execution.
-            </p>
+            <p class="bounty-desc"><span style="color: var(--hex-gold);">>> OBJECTIVE:</span> Trade 20,000 USDT volume. Reward distributed as Trial Fund.</p>
             <div class="progress-bar"><div class="progress-fill" style="width: 60%;"></div></div>
             <a href="https://bingx.com/invite/YOUR_CODE" target="_blank" class="claim-btn">START TRADING</a>
         </div>
-
         <div class="bounty-card">
             <div class="bounty-title">Daily Supply Drop</div>
             <div class="reward-amount">VARIES</div>
-            <p class="bounty-desc">
-                Daily Check-In required. Rewards increase for consecutive days active on the terminal.
-            </p>
+            <p class="bounty-desc">Daily Check-In required. Rewards increase for consecutive days active on the terminal.</p>
             <div class="progress-bar"><div class="progress-fill" style="width: 100%;"></div></div>
             <a href="https://bingx.com/invite/YOUR_CODE" target="_blank" class="claim-btn">CHECK IN NOW</a>
         </div>
-
     </div>
-
-    <div style="margin-top: 50px; font-size: 0.7rem; color: var(--hex-dark-accent);">
-        *TERMS & CONDITIONS APPLY. DATA ENCRYPTED.
-    </div>
-
 </body>
 </html>
