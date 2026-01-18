@@ -217,6 +217,54 @@
                 border-right: none;
             }
         }
+        /* --- CLASSIFIED ALERT BUTTON STYLES --- */
+.classified-alert {
+    position: fixed;
+    bottom: 60px; /* Sits just above the footer */
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 60, 60, 0.1); /* Low opacity red */
+    border: 1px solid #ff3c3c;
+    color: #ff3c3c;
+    padding: 12px 25px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    z-index: 999;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(2px);
+    
+    /* Breathing Animation */
+    animation: pulseAlert 3s infinite;
+}
+
+.classified-alert:hover {
+    background: #ff3c3c;
+    color: #000;
+    box-shadow: 0 0 30px #ff3c3c;
+    cursor: alias;
+}
+
+.blink { animation: blinker 1s linear infinite; margin-right: 8px; }
+
+@keyframes pulseAlert {
+    0% { box-shadow: 0 0 0 rgba(255, 60, 60, 0); border-color: rgba(255, 60, 60, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(255, 60, 60, 0.3); border-color: #ff3c3c; }
+    100% { box-shadow: 0 0 0 rgba(255, 60, 60, 0); border-color: rgba(255, 60, 60, 0.5); }
+}
+
+@keyframes blinker { 50% { opacity: 0; } }
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .classified-alert {
+        width: 90%;
+        text-align: center;
+        bottom: 50px;
+    }
+}
         
     </style>
 </head>
@@ -390,5 +438,10 @@
         // 3. Audio Effect (Optional - won't play without user interaction policy, but good for "Genius" feel)
         // Note: Browsers block auto-audio, so we'd usually attach this to the first click.
     </script>
+    
+    <a href="strategy.html" class="classified-alert">
+    <span class="blink">⚠</span> DETECTED: "99%" STRATEGY FILE
+</a>
+
 </body>
 </html>
