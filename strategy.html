@@ -8,126 +8,74 @@
     
     <style>
         :root {
-            --hex-bg: rgb(7, 22, 15);
-            --hex-grid: rgb(32, 49, 38);
-            --hex-text: rgb(94, 252, 135);
-            --hex-muted: rgb(123, 156, 135);
-            --hex-alert: rgb(255, 60, 60);
-            --hex-gold: rgb(255, 215, 0);
-            --hex-dark-accent: rgb(39, 63, 44);
+            --hex-bg: #07160F;
+            --hex-grid: #203126;
+            --hex-text: #5EFC87;
+            --hex-muted: #7B9C87;
+            --hex-alert: #FF3C3C;
+            --hex-gold: #FFD700;
+            --hex-dark-accent: #273F2C;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--hex-bg); color: var(--hex-text); font-family: 'JetBrains Mono', monospace; padding: 40px 20px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; cursor: crosshair; }
 
-        body {
-            background-color: var(--hex-bg);
-            color: var(--hex-text);
-            font-family: 'JetBrains Mono', monospace;
-            padding: 40px 20px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        /* --- TACTICAL DECOR --- */
         .grid-bg {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-image: linear-gradient(var(--hex-grid) 1px, transparent 1px), linear-gradient(90deg, var(--hex-grid) 1px, transparent 1px);
             background-size: 40px 40px; opacity: 0.3; z-index: -1;
         }
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px; z-index: 10; pointer-events: none; opacity: 0.4;
+        }
 
-        /* --- HEADER --- */
         header { text-align: center; margin-bottom: 50px; max-width: 700px; border-bottom: 2px solid var(--hex-text); padding-bottom: 20px; }
         h1 { font-size: 2rem; margin-bottom: 10px; color: var(--hex-text); text-transform: uppercase; letter-spacing: -1px; }
         .classification { color: var(--hex-alert); font-weight: bold; border: 1px solid var(--hex-alert); padding: 2px 8px; font-size: 0.7rem; display: inline-block; margin-bottom: 15px; }
 
-        /* --- CONTENT CARDS --- */
-        .briefing-card {
-            background: rgba(7, 22, 15, 0.95);
-            border: 1px solid var(--hex-dark-accent);
-            max-width: 700px; width: 100%;
-            padding: 30px; margin-bottom: 30px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
-        }
-
+        .briefing-card { background: rgba(7, 22, 15, 0.95); border: 1px solid var(--hex-dark-accent); max-width: 700px; width: 100%; padding: 30px; margin-bottom: 30px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
         .step-num { font-size: 3rem; font-weight: 700; color: var(--hex-grid); float: right; line-height: 1; }
         h2 { font-size: 1.2rem; margin-bottom: 15px; color: var(--hex-gold); text-transform: uppercase; }
         p { margin-bottom: 15px; color: var(--hex-muted); line-height: 1.6; }
-        
         .highlight { color: var(--hex-text); font-weight: bold; }
         .warning { color: var(--hex-alert); }
 
-        /* --- ASCII DIAGRAM --- */
-        .diagram {
-            font-family: 'Courier New', monospace;
-            white-space: pre;
-            background: #000;
-            color: var(--hex-text);
-            padding: 20px;
-            border: 1px dashed var(--hex-muted);
-            margin: 20px 0;
-            overflow-x: auto;
-            font-size: 0.7rem;
-            line-height: 1.1;
-        }
+        .diagram { font-family: 'Courier New', monospace; white-space: pre; background: #000; color: var(--hex-text); padding: 20px; border: 1px dashed var(--hex-muted); margin: 20px 0; overflow-x: auto; font-size: 0.7rem; line-height: 1.1; }
 
-        /* --- BACK BUTTON --- */
-        .nav-back {
-            position: fixed; top: 20px; left: 20px;
-            text-decoration: none; color: var(--hex-muted); font-size: 0.8rem;
-            border: 1px solid var(--hex-dark-accent); padding: 5px 15px;
-            background: var(--hex-bg); z-index: 100;
-        }
+        .nav-back { position: fixed; top: 20px; left: 20px; text-decoration: none; color: var(--hex-muted); font-size: 0.8rem; border: 1px solid var(--hex-dark-accent); padding: 5px 15px; background: var(--hex-bg); z-index: 100; }
         .nav-back:hover { color: var(--hex-text); border-color: var(--hex-text); }
-
     </style>
 </head>
 <body>
-
-    <div class="grid-bg"></div>
+    <div class="grid-bg"></div><div class="scanlines"></div>
     <a href="home.html" class="nav-back">< MISSION CONTROL</a>
 
     <header>
         <div class="classification">CLASSIFIED // EYES ONLY</div>
         <h1>Protocol: The Liquidity Trap</h1>
-        <p style="color: var(--hex-muted); font-size: 0.9rem;">
-            THE "99% PROBABILITY" SETUP<br>
-            Tracking the Market Maker's Footprints.
-        </p>
+        <p style="color: var(--hex-muted); font-size: 0.9rem;">THE "99% PROBABILITY" SETUP<br>Tracking the Market Maker's Footprints.</p>
     </header>
 
     <div class="briefing-card">
         <h2>The Logic</h2>
-        <p>
-            Retail traders place their Stop Losses at obvious Highs and Lows. Market Makers (Whales) need liquidity to fill their large orders. 
-        </p>
-        <p>
-            They push price <strong>past</strong> the level to trigger those stops (The Trap), collect the liquidity, and then immediately reverse.
-            <br><br>
-            <span class="highlight">WE DO NOT CHASE THE BREAKOUT. WE WAIT FOR THE MURDER.</span>
-        </p>
+        <p>Retail traders place their Stop Losses at obvious Highs and Lows. Market Makers (Whales) need liquidity to fill their large orders.</p>
+        <p>They push price <strong>past</strong> the level to trigger those stops (The Trap), collect the liquidity, and then immediately reverse.<br><br><span class="highlight">WE DO NOT CHASE THE BREAKOUT. WE WAIT FOR THE MURDER.</span></p>
     </div>
 
     <div class="briefing-card" style="border-color: var(--hex-text);">
         <span class="step-num">01</span>
         <h2>Identify The Kill Zone</h2>
-        <p>
-            Look at the <strong>15m or 1H chart</strong>. Find a clean "Previous High" or "Previous Low" that looks too obvious.
-        </p>
+        <p>Look at the <strong>15m or 1H chart</strong>. Find a clean "Previous High" or "Previous Low" that looks too obvious.</p>
         <p class="highlight">ACTION: Draw a horizontal line at that price level.</p>
     </div>
 
     <div class="briefing-card" style="border-color: var(--hex-text);">
         <span class="step-num">02</span>
         <h2>The Sweep (The Hunt)</h2>
-        <p>
-            Wait for price to break that line aggressively. Retail traders will scream "BREAKOUT!" and FOMO in.
-        </p>
-        <p class="warning">
-            ⚠️ DO NOT ENTER YET. If price stays above the line, it is a real breakout. We need it to FAIL.
-        </p>
-        
+        <p>Wait for price to break that line aggressively. Retail traders will scream "BREAKOUT!" and FOMO in.</p>
+        <p class="warning">⚠️ DO NOT ENTER YET. If price stays above the line, it is a real breakout. We need it to FAIL.</p>
         <div class="diagram">
        (RESISTANCE LINE) -----------------------------------
                                       ^
@@ -143,28 +91,16 @@
     <div class="briefing-card" style="border-color: var(--hex-gold);">
         <span class="step-num">03</span>
         <h2>The Reclaim (The Trigger)</h2>
-        <p>
-            Wait for a candle to <strong>CLOSE back inside</strong> the range. This confirms the breakout was fake. The trap is sprung.
-        </p>
+        <p>Wait for a candle to <strong>CLOSE back inside</strong> the range. This confirms the breakout was fake. The trap is sprung.</p>
         <ul style="margin-left: 20px; color: var(--hex-muted); margin-top: 10px;">
             <li><strong>ENTRY:</strong> Immediately on the candle close.</li>
             <li><strong>STOP LOSS:</strong> Just above/below the wick of the sweep.</li>
             <li><strong>TARGET:</strong> Liquidity on the opposite side of the range.</li>
         </ul>
     </div>
-
+    
     <div style="text-align: center; margin-top: 20px;">
-        <p style="color: var(--hex-muted); font-size: 0.8rem; margin-bottom: 20px;">
-            READY TO EXECUTE THIS SETUP?
-        </p>
-        <a href="basecamp.html" style="
-            background: var(--hex-text); color: var(--hex-bg);
-            padding: 15px 30px; text-decoration: none; font-weight: bold;
-            display: inline-block; text-transform: uppercase;
-        ">
-            OPEN TERMINAL
-        </a>
+        <a href="basecamp.html" style="background: var(--hex-text); color: var(--hex-bg); padding: 15px 30px; text-decoration: none; font-weight: bold; display: inline-block; text-transform: uppercase;">OPEN TERMINAL</a>
     </div>
-
 </body>
 </html>
