@@ -8,76 +8,56 @@
     
     <style>
         :root {
-            --hex-bg: rgb(7, 22, 15);
-            --hex-grid: rgb(32, 49, 38);
-            --hex-text: rgb(94, 252, 135);
-            --hex-muted: rgb(123, 156, 135);
-            --hex-up: rgb(94, 252, 135);
-            --hex-down: rgb(255, 60, 60);
-            --hex-dark-accent: rgb(39, 63, 44);
+            --hex-bg: #07160F;
+            --hex-grid: #203126;
+            --hex-text: #5EFC87;
+            --hex-muted: #7B9C87;
+            --hex-up: #5EFC87;
+            --hex-down: #FF3C3C;
+            --hex-dark-accent: #273F2C;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
-            background-color: var(--hex-bg);
-            color: var(--hex-text);
-            font-family: 'JetBrains Mono', monospace;
-            padding: 20px;
-            min-height: 100vh;
+            background-color: var(--hex-bg); color: var(--hex-text); font-family: 'JetBrains Mono', monospace;
+            padding: 20px; min-height: 100vh;
         }
 
         .grid-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                linear-gradient(var(--hex-grid) 1px, transparent 1px),
-                linear-gradient(90deg, var(--hex-grid) 1px, transparent 1px);
+            background-image: linear-gradient(var(--hex-grid) 1px, transparent 1px), linear-gradient(90deg, var(--hex-grid) 1px, transparent 1px);
             background-size: 30px 30px; opacity: 0.3; z-index: -1;
         }
-
-        .nav-back {
-            display: inline-block; margin-bottom: 20px;
-            color: var(--hex-muted); text-decoration: none; border: 1px solid var(--hex-dark-accent);
-            padding: 8px 16px; transition: 0.3s;
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px; z-index: 10; pointer-events: none; opacity: 0.4;
         }
+
+        .nav-back { display: inline-block; margin-bottom: 20px; color: var(--hex-muted); text-decoration: none; border: 1px solid var(--hex-dark-accent); padding: 8px 16px; transition: 0.3s; background: rgba(7,22,15,0.8); }
         .nav-back:hover { color: var(--hex-text); border-color: var(--hex-text); }
 
         .header-row { display: flex; justify-content: space-between; align-items: end; margin-bottom: 30px; border-bottom: 1px solid var(--hex-dark-accent); padding-bottom: 10px; }
         h1 { font-size: 1.8rem; margin: 0; text-transform: uppercase; }
-        .status { font-size: 0.7rem; color: var(--hex-muted); }
+        .status { font-size: 0.7rem; color: var(--hex-muted); animation: flash 2s infinite; }
+        @keyframes flash { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-        /* ASSET GRID */
-        .market-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 15px;
-        }
-
+        .market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; }
         .asset-card {
-            background: rgba(7, 22, 15, 0.8);
-            border: 1px solid var(--hex-dark-accent);
-            padding: 15px;
-            position: relative;
-            transition: 0.3s;
+            background: rgba(7, 22, 15, 0.8); border: 1px solid var(--hex-dark-accent); padding: 15px;
+            position: relative; transition: 0.3s;
         }
         .asset-card:hover { border-color: var(--hex-text); background: rgba(32, 49, 38, 0.4); }
-
         .top-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
         .symbol { font-weight: bold; font-size: 1.1rem; }
         .change { font-size: 0.8rem; font-weight: bold; padding: 2px 6px; border-radius: 2px; }
         .up { color: #000; background: var(--hex-up); }
         .down { color: #fff; background: var(--hex-down); }
-
         .price { font-size: 1.4rem; letter-spacing: -1px; margin-bottom: 5px; }
         .vol-label { font-size: 0.65rem; color: var(--hex-muted); text-transform: uppercase; }
-
-        .loader { text-align: center; color: var(--hex-muted); padding: 50px; width: 100%; grid-column: 1 / -1; }
-
     </style>
 </head>
 <body>
-
-    <div class="grid-bg"></div>
+    <div class="grid-bg"></div><div class="scanlines"></div>
     <a href="home.html" class="nav-back">< RETURN TO BASE</a>
 
     <div class="header-row">
@@ -85,45 +65,28 @@
         <div class="status" id="status-line">SCANNING NETWORK...</div>
     </div>
 
-    <div class="market-grid" id="grid-target">
-        <div class="loader">ESTABLISHING CONNECTION TO SATELLITE FEED...</div>
-    </div>
+    <div class="market-grid" id="grid-target"></div>
 
     <script>
-        // EXPANDED ASSET LIST
         const targets = [
-            {id: 'bitcoin', symbol: 'BTC'},
-            {id: 'ethereum', symbol: 'ETH'},
-            {id: 'solana', symbol: 'SOL'},
-            {id: 'binancecoin', symbol: 'BNB'},
-            {id: 'ripple', symbol: 'XRP'},
-            {id: 'dogecoin', symbol: 'DOGE'},
-            {id: 'cardano', symbol: 'ADA'},
-            {id: 'avalanche-2', symbol: 'AVAX'},
-            {id: 'chainlink', symbol: 'LINK'},
-            {id: 'polkadot', symbol: 'DOT'},
-            {id: 'matic-network', symbol: 'MATIC'},
-            {id: 'shiba-inu', symbol: 'SHIB'},
-            {id: 'uniswap', symbol: 'UNI'},
-            {id: 'litecoin', symbol: 'LTC'},
-            {id: 'bitcoin-cash', symbol: 'BCH'},
-            {id: 'ethereum-classic', symbol: 'ETC'}
+            {id: 'bitcoin', symbol: 'BTC'}, {id: 'ethereum', symbol: 'ETH'}, {id: 'solana', symbol: 'SOL'},
+            {id: 'binancecoin', symbol: 'BNB'}, {id: 'ripple', symbol: 'XRP'}, {id: 'dogecoin', symbol: 'DOGE'},
+            {id: 'cardano', symbol: 'ADA'}, {id: 'avalanche-2', symbol: 'AVAX'}, {id: 'chainlink', symbol: 'LINK'},
+            {id: 'polkadot', symbol: 'DOT'}, {id: 'matic-network', symbol: 'MATIC'}, {id: 'shiba-inu', symbol: 'SHIB'},
+            {id: 'uniswap', symbol: 'UNI'}, {id: 'litecoin', symbol: 'LTC'}, {id: 'bitcoin-cash', symbol: 'BCH'}, {id: 'ethereum-classic', symbol: 'ETC'}
         ];
 
         async function fetchMarketData() {
             try {
                 const ids = targets.map(t => t.id).join(',');
-                // Adding 'last_updated_at' to bust cache slightly
                 const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`);
                 const data = await res.json();
-
                 const grid = document.getElementById('grid-target');
                 grid.innerHTML = ''; 
 
                 targets.forEach(t => {
                     const item = data[t.id];
                     if(!item) return;
-
                     const price = item.usd;
                     const change = item.usd_24h_change.toFixed(2);
                     const isUp = change >= 0;
@@ -139,17 +102,12 @@
                         </div>
                     `;
                 });
-
                 const now = new Date();
                 document.getElementById('status-line').innerText = `DATA SYNCED: ${now.toLocaleTimeString()} // SOURCE: PUBLIC FEED`;
-
-            } catch (e) {
-                console.log("Fetch error", e);
-            }
+            } catch (e) { console.log("Fetch error", e); }
         }
-
         fetchMarketData();
-        setInterval(fetchMarketData, 30000); // 30s refresh
+        setInterval(fetchMarketData, 30000);
     </script>
 </body>
 </html>
