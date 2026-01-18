@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BAGSEEKER // MARKET SURVEILLANCE</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --hex-bg: rgb(7, 22, 15);
+            --hex-grid: rgb(32, 49, 38);
+            --hex-text: rgb(94, 252, 135);
+            --hex-muted: rgb(123, 156, 135);
+            --hex-up: rgb(94, 252, 135);
+            --hex-down: rgb(255, 60, 60);
+            --hex-dark-accent: rgb(39, 63, 44);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--hex-bg);
+            color: var(--hex-text);
+            font-family: 'JetBrains Mono', monospace;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        /* --- TACTICAL GRID --- */
+        .grid-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(var(--hex-grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--hex-grid) 1px, transparent 1px);
+            background-size: 40px 40px; opacity: 0.3; z-index: -1;
+        }
+
+        .nav-back {
+            display: inline-block; margin-bottom: 30px;
+            color: var(--hex-muted); text-decoration: none; border: 1px solid var(--hex-dark-accent);
+            padding: 8px 16px; transition: 0.3s;
+        }
+        .nav-back:hover { color: var(--hex-text); border-color: var(--hex-text); }
+
+        h1 { font-size: 2rem; margin-bottom: 10px; text-transform: uppercase; }
+        .last-update { font-size: 0.75rem; color: var(--hex-muted); margin-bottom: 40px; }
+
+        /* --- ASSET GRID --- */
+        .market-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .asset-card {
+            background: rgba(7, 22, 15, 0.9);
+            border: 1px solid var(--hex-dark-accent);
+            padding: 20px;
+            position: relative;
+            transition: 0.3s;
+        }
+        .asset-card:hover { border-color: var(--hex-text); box-shadow: 0 0 15px rgba(94, 252, 135, 0.1); }
+
+        .symbol { font-size: 1.2rem; font-weight: bold; margin-bottom: 5px; }
+        .name { font-size: 0.8rem; color: var(--hex-muted); text-transform: uppercase; }
+        
+        .price { font-size: 1.5rem; margin: 15px 0; letter-spacing: -1px; }
+        
+        .change-pill {
+            display: inline-block; padding: 4px 8px; font-size: 0.8rem; font-weight: bold;
+            border: 1px solid transparent;
+        }
+        .up { color: var(--hex-bg); background: var(--hex-up); }
+        .down { color: var(--hex-bg); background: var(--hex-down); }
+
+        .mini-chart {
+            height: 40px; width: 100%; margin-top: 15px;
+            border-bottom: 1px solid var(--hex-dark-accent);
+            display: flex; align-items: flex-end; gap: 2px;
+            opacity: 0.5;
+        }
+        .bar { background: var(--hex-text); flex: 1; }
+
+    </style>
+</head>
+<body>
+
+    <div class="grid-bg"></div>
+    <a href="home.html" class="nav-back">< RETURN TO BASE</a>
+
+    <h1>MARKET SURVEILLANCE</h1>
+    <div class="last-update" id="status-line">ESTABLISHING DATALINK...</div>
+
+    <div class="market-grid" id="grid-target">
+        </div>
+
+    <script>
+        const targets = [
+            {id: 'bitcoin', symbol: 'BTC'},
+            {id: 'ethereum', symbol: 'ETH'},
+            {id: 'solana', symbol: 'SOL'},
+            {id: 'ripple', symbol: 'XRP'},
+            {id: 'dogecoin', symbol: 'DOGE'},
+            {id: 'cardano', symbol: 'ADA'},
+            {id: 'avalanche-2', symbol: 'AVAX'},
+            {id: 'chainlink', symbol: 'LINK'},
+            {id: 'polkadot', symbol: 'DOT'},
+            {id: 'matic-network', symbol: 'MATIC'},
+            {id: 'shiba-inu', symbol: 'SHIB'},
+            {id: 'uniswap', symbol: 'UNI'}
+        ];
+
+        async function fetchMarketData() {
+            try {
+                // Using CoinGecko API (No key required for basic use)
+                const ids = targets.map(t => t.id).join(',');
+                const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`);
+                const data = await res.json();
+
+                const grid = document.getElementById('grid-target');
+                grid.innerHTML = ''; // Clear current
+
+                targets.forEach(t => {
+                    const item = data[t.id];
+                    if(!item) return;
+
+                    const price = item.usd;
+                    const change = item.usd_24h_change.toFixed(2);
+                    const isUp = change >= 0;
+
+                    // Fake mini-chart generation for visual flair
+                    let bars = '';
+                    for(let i=0; i<15; i++) {
+                        let h = Math.floor(Math.random() * 80) + 20;
+                        bars += `<div class="bar" style="height:${h}%; opacity:${Math.random()};"></div>`;
+                    }
+
+                    grid.innerHTML += `
+                        <div class="asset-card">
+                            <div style="display:flex; justify-content:space-between;">
+                                <div>
+                                    <div class="symbol">${t.symbol} / USD</div>
+                                    <div class="name">${t.id.toUpperCase()}</div>
+                                </div>
+                                <div class="change-pill ${isUp ? 'up' : 'down'}">
+                                    ${isUp ? '+' : ''}${change}%
+                                </div>
+                            </div>
+                            <div class="price">$${price.toLocaleString()}</div>
+                            <div class="mini-chart">${bars}</div>
+                        </div>
+                    `;
+                });
+
+                document.getElementById('status-line').innerText = `LAST UPDATE: ${new Date().toLocaleTimeString()} // SOURCE: COINGECKO`;
+
+            } catch (e) {
+                console.log("Data fetch error", e);
+                document.getElementById('status-line').innerText = "DATALINK INTERRUPTED. RETRYING...";
+            }
+        }
+
+        fetchMarketData();
+        setInterval(fetchMarketData, 20000); // Update every 20s to respect API limits
+    </script>
+</body>
+</html>
